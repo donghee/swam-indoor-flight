@@ -18,15 +18,6 @@ cd ~/src
 git clone https://github.com/doojinkang/mission 
 ```
 
-### Build Groundstation on docker
-
-```
-cd ~/src/mission
-yarn install
-```
-
-----
-
 ## Swam node
 
 ```
@@ -35,29 +26,11 @@ mkdir -p ~/catkin_ws/src
 cp -Rf swam ~/catkin_ws/src/
 ```
 
-### Build swam node on docker
-
-```
-cd ~/catkin_ws
-catkin init
-wstool init src
-catkin build
-source devel/setup.bash
-```
-
-----
-
 ## Run groundstation and swam node on docker
 
-```
-mkdir ~/.tmuxinator
+### Run 
 
-tmuxinator new simulator
-tmuxinator new server
-
-cp ~/src/swam-indoor-flight/simulator.yml ~/.tmuxinator/
-cp ~/src/swam-indoor-flight/server.yml ~/.tmuxinator/
-```
+Docker Image: https://hub.docker.com/r/donghee/swam-indoor-flight
 
 ```
 cd ~/src/swam-indoor-flight/scripts
@@ -70,3 +43,48 @@ OR
 cd ~/src/swam-indoor-flight/scripts
 ./run-server.sh
 ```
+
+----
+
+### First Run to make environments
+
+Execute on *Docker*
+
+#### Add tmuxinator configures 
+
+```
+mkdir ~/.tmuxinator
+
+tmuxinator new simulator
+tmuxinator new server
+
+cp ~/src/swam-indoor-flight/simulator.yml ~/.tmuxinator/
+cp ~/src/swam-indoor-flight/server.yml ~/.tmuxinator/
+```
+
+#### Build Groundstation on docker
+
+```
+cd ~/src/mission
+yarn install
+```
+
+#### Build swam node on docker
+
+```
+cd ~/catkin_ws
+catkin init
+wstool init src
+catkin build
+source devel/setup.bash
+```
+
+#### Build PX4 sitl gazebo on docker
+
+```
+git clone https://github.com/PX4/Firmware
+cd Firmware
+make px4_sitl_default
+make px4_sitl_default sitl_gazebo
+```
+
