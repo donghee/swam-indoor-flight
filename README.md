@@ -82,6 +82,7 @@ source devel/setup.bash
 #### Build PX4 sitl gazebo on docker
 
 ```
+cd ~/src
 git clone https://github.com/PX4/Firmware
 cd Firmware
 make px4_sitl_default
