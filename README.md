@@ -6,14 +6,14 @@ cd ~/src
 git clone https://github.com/donghee/swam-indoor-flight 
 ```
 
-# Groundstation
+## Groundstation
 
 ```
 cd ~/src
 git clone https://github.com/doojinkang/mission 
 ```
 
-## Build Groundstation on docker
+### Build Groundstation on docker
 
 ```
 cd ~/src/mission
@@ -22,14 +22,14 @@ yarn install
 
 ----
 
-# Swam node
+## Swam node
 
 ```
 mkdir -p ~/catkin_ws/src
 cp -Rf swam ~/catkin_ws/src/
 ```
 
-## Build swam node on docker
+### Build swam node on docker
 
 ```
 cd ~/catkin_ws
@@ -41,7 +41,7 @@ source devel/setup.bash
 
 ----
 
-# Run groundstation and swam node on docker
+## Run groundstation and swam node on docker
 
 ```
 tmuxinator new simulator.yaml
