@@ -47,8 +47,8 @@ source devel/setup.bash
 ```
 mkdir ~/.tmuxinator
 
-tmuxinator new simulator.yaml
-tmuxinator new server.yaml
+tmuxinator new simulator
+tmuxinator new server
 
 cp ~/src/swam-indoor-flight/simulator.yml ~/.tmuxinator/
 cp ~/src/swam-indoor-flight/server.yml ~/.tmuxinator/
