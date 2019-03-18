@@ -218,37 +218,18 @@ class MavrosOffboardPosctl(MavrosCommon):
         quaternion = quaternion_from_euler(0, 0, yaw)
         self.pos.pose.orientation = Quaternion(*quaternion)
 
-    def ready_to_offboard(self):
-        # on gazebo
-        # self.log_topic_vars()
-        # self.set_mode("OFFBOARD", 10)
-        # self.set_arm(True, 5)
-
-        # on pixracer
-        self.wait_for_topics(60)
-        self.wait_for_landed_state(mavutil.mavlink.MAV_LANDED_STATE_ON_GROUND,
-                                   10, -1)
-
-        self.set_mode("AUTO.LAND", 5)
-        self.set_arm(True, 5)
-        self.set_mode("AUTO.TAKEOFF", 5)
-        rospy.sleep(1) # wait for AUTO.LOITOR
-        
-        self.log_topic_vars()
-        self.set_mode("OFFBOARD", 10)
-
-        rospy.loginfo("Ready to OFFBOARD")
-        
-
     def play(self):
-        # make sure the simulation is ready to start the mission
-        self.wait_for_topics(60)
-        self.wait_for_landed_state(mavutil.mavlink.MAV_LANDED_STATE_ON_GROUND,
-                                   10, -1)
+        if self.state.armed == True and (self.state.mode == 'AUTO.TAKEOFF' or self.state.mode == 'AUTO.LOITOR' or self.state.mode == 'OFFBOARD') :
+            rospy.sleep(2) # wait
+        else:
+            self.wait_for_topics(60)
+            self.wait_for_landed_state(mavutil.mavlink.MAV_LANDED_STATE_ON_GROUND,
+                                       10, -1)
 
-        self.set_mode("AUTO.LAND", 5)
-        self.set_arm(True, 5)
-        self.set_mode("AUTO.TAKEOFF", 5)
+            self.set_mode("AUTO.LAND", 5)
+            self.set_arm(True, 5)
+            self.set_mode("AUTO.TAKEOFF", 5)
+            
         rospy.sleep(1) # wait for AUTO.LOITOR
         
         self.log_topic_vars()
@@ -265,10 +246,6 @@ class MavrosOffboardPosctl(MavrosCommon):
 
 from std_srvs.srv import Trigger, TriggerResponse
 
-def swam_ready_response(request):
-    mav.ready_to_offboard()
-    return TriggerResponse(success=True, message='Good')
-
 def swam_start_response(request):
     mav.play()
     return TriggerResponse(success=True, message='Good')
@@ -281,7 +258,7 @@ if __name__ == '__main__':
     rospy.init_node('offboard_posctl', anonymous=True)
     mav = MavrosOffboardPosctl()
 
-    swam_ready_service = rospy.Service('swam/ready', Trigger, swam_ready_response) # r
+    swam_ready_service = rospy.Service('swam/ready', Trigger, swam_start_response) # r
     swam_play_service = rospy.Service('swam/play', Trigger, swam_start_response) # Here
     swam_stop_service = rospy.Service('swam/stop', Trigger, swam_stop_response) # land
     swam_goal_sub = rospy.Subscriber('swam/goal', PoseStamped, mav.goal) # Set
