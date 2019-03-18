@@ -24,10 +24,12 @@ source devel/setup.bash
 ```
 cp -Rf scripts ~/project_swam
 ```
-````
+```
 ~/project_swam/scripts/run-simulator.sh
 ```
+
 or
+
 ```
 ~/project_swam/scripts/run-server.sh
 ```
