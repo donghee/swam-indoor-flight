@@ -1,35 +1,59 @@
 # Swam-indoor-flight
 
 ```
-mkdir ~/project_swam
-mkdir -p ~/catkin_ws/src
+mkdir ~/src
+cd ~/src
+git clone https://github.com/donghee/swam-indoor-flight 
 ```
-# Clone Groundstation
+
+# Groundstation
+
 ```
-git clone https://github.com/doojin.kang/mission 
-mv mission ~/project_swam
+cd ~/src
+git clone https://github.com/doojinkang/mission 
 ```
+
+## Build Groundstation on docker
+
+```
+cd ~/src/mission
+yarn install
+```
+
+----
+
 # Swam node
+
 ```
+mkdir -p ~/catkin_ws/src
 cp -Rf swam ~/catkin_ws/src/
 ```
-## Build swam node On docker
+
+## Build swam node on docker
+
 ```
 cd ~/catkin_ws
 catkin init
 wstool init src
+catkin build
 source devel/setup.bash
 ```
-# Run groundstation and mavros node on docker image
-```
-cp -Rf scripts ~/project_swam
-```
-```
-~/project_swam/scripts/run-simulator.sh
-```
 
-or
+----
+
+# Run groundstation and swam node on docker
 
 ```
-~/project_swam/scripts/run-server.sh
+tmuxinator new simulator.yaml
+cp ~/src/swam-indoor-flight/simulator.yaml ~/.tmuxinator/
+```
+
+```
+~/src/swam-indoor-flight/scripts/run-simulator.sh
+```
+
+OR
+
+```
+~/src/swam-indoor-flight/scripts/run-server.sh
 ```

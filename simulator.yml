@@ -1,0 +1,19 @@
+name: simulator
+root: ~/catkin_ws
+windows:
+  - ros:
+      #layout: even-horizontal
+      layout: main-vertical
+      # Synchronize all panes of this window, can be enabled before or after the pane commands run.
+      # 'before' represents legacy functionality and will be deprecated in a future release, in favour of 'after'
+      #synchronize: after
+      panes:
+        - roscore
+        - sleep 4; roslaunch rosbridge_server rosbridge_websocket.launch
+        - sleep 2; ~/src/swam-indoor-flight/scripts/run-multi-uav-mavros-sitl.sh
+  - editor: emacs -Q
+  - server:
+      layout: even-horizontal
+      panes:
+        - cd ~/src/mission; sleep 1;  yarn start
+        - sleep 10; ~/src/swam-indoor-flight/scripts/run-multi-uav-mavros-sitl-posctl.sh
