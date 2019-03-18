@@ -78,29 +78,35 @@ class MavrosOffboardPosctl(MavrosCommon):
         self.pos_thread.start()
 
         # send hearbeat
+        self.ids = None
+        self.mavlink_sub = rospy.Subscriber('mavlink/from', Mavlink, self.mavlink_from_callback)
         self.mavlink_pub = rospy.Publisher('mavlink/to', Mavlink, queue_size=1)
         self.heartbeat_thread = Thread(target=self.send_heartbeat, args=())
         self.heartbeat_thread.daemon = True
         self.heartbeat_thread.start()
 
-        # get statustext 
-        self.statustext_sub = rospy.Subscriber('mavros/statustext/recv', StatusText, self.statustext_callback)
+        # get statustext
+        # self.statustext_sub = rospy.Subscriber('mavros/statustext/recv', StatusText, self.statustext_callback)
+
+    def mavlink_from_callback(self, data):
+        self.ids = (data.sysid, data.compid)
+        self.mavlink_sub.unregister()
 
     def statustext_callback(self, data):
-        # rospy.loginfo(data.severity)                
-        # rospy.loginfo(data.text)
-        pass        
+        rospy.loginfo('STATUSTEXT: {0} {1}'.format(data.severity, data.text))
 
     def send_heartbeat(self):
         rate = rospy.Rate(2)  # Hz
-        self.heartbeat_msg = mavutil.mavlink.MAVLink_heartbeat_message(
-            mavutil.mavlink.MAV_TYPE_GCS, 0, 0, 0, 0, 0)
-        
-        self.heartbeat_msg.pack(mavutil.mavlink.MAVLink('', 1, 1))
-        self.heartbeat_ros = mavlink.convert_to_rosmsg(self.heartbeat_msg)
         while not rospy.is_shutdown():
             try:
-                self.mavlink_pub.publish(self.heartbeat_ros)
+                if self.ids is not None:
+                    self.heartbeat_msg = mavutil.mavlink.MAVLink_heartbeat_message(
+                        mavutil.mavlink.MAV_TYPE_GCS, 0, 0, 0, 0, 0)
+                    # rospy.loginfo('ID: {0}, {1}'.format(self.ids[0], self.ids[1]))
+                    # self.heartbeat_msg.pack(mavutil.mavlink.MAVLink('', self.ids[0], self.ids[1])) # fcu
+                    self.heartbeat_msg.pack(mavutil.mavlink.MAVLink('', 1, 1)) # simulator
+                    self.heartbeat_ros = mavlink.convert_to_rosmsg(self.heartbeat_msg)
+                    self.mavlink_pub.publish(self.heartbeat_ros)
                 rate.sleep()
             except rospy.ROSInterruptException:
                 pass
