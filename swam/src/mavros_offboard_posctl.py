@@ -32,7 +32,7 @@
 #
 #***************************************************************************/
 # Donghee Park <dongheepark@gmail.com>
-# based on Andreas Antener <andreas@uaventure.com>
+# base code on Andreas Antener <andreas@uaventure.com>
 #
 # The shebang of this file is currently Python2 because some
 # dependencies such as pymavlink don't play well with Python3 yet.
@@ -50,6 +50,9 @@ from std_msgs.msg import Header
 from threading import Thread
 from tf.transformations import quaternion_from_euler
 
+# heartbeat and statustext
+from mavros_msgs.msg import Mavlink, StatusText
+from mavros import mavlink
 
 class MavrosOffboardPosctl(MavrosCommon):
     """
@@ -74,6 +77,34 @@ class MavrosOffboardPosctl(MavrosCommon):
         self.pos_thread.daemon = True
         self.pos_thread.start()
 
+        # send hearbeat
+        self.mavlink_pub = rospy.Publisher('mavlink/to', Mavlink, queue_size=1)
+        self.heartbeat_thread = Thread(target=self.send_heartbeat, args=())
+        self.heartbeat_thread.daemon = True
+        self.heartbeat_thread.start()
+
+        # get statustext 
+        self.statustext_sub = rospy.Subscriber('mavros/statustext/recv', StatusText, self.statustext_callback)
+
+    def statustext_callback(self, data):
+        # rospy.loginfo(data.severity)                
+        # rospy.loginfo(data.text)
+        pass        
+
+    def send_heartbeat(self):
+        rate = rospy.Rate(2)  # Hz
+        self.heartbeat_msg = mavutil.mavlink.MAVLink_heartbeat_message(
+            mavutil.mavlink.MAV_TYPE_GCS, 0, 0, 0, 0, 0)
+        
+        self.heartbeat_msg.pack(mavutil.mavlink.MAVLink('', 1, 1))
+        self.heartbeat_ros = mavlink.convert_to_rosmsg(self.heartbeat_msg)
+        while not rospy.is_shutdown():
+            try:
+                self.mavlink_pub.publish(self.heartbeat_ros)
+                rate.sleep()
+            except rospy.ROSInterruptException:
+                pass
+                                                                                
 
     def send_pos(self):
         rate = rospy.Rate(10)  # Hz
@@ -194,14 +225,13 @@ class MavrosOffboardPosctl(MavrosCommon):
 
         self.set_mode("AUTO.LAND", 5)
         self.set_arm(True, 5)
-        rospy.sleep(2) # need spin up to stable 
         self.set_mode("AUTO.TAKEOFF", 5)
-        rospy.sleep(2) # wait for AUTO.LOITOR
+        rospy.sleep(1) # wait for AUTO.LOITOR
         
         self.log_topic_vars()
         self.set_mode("OFFBOARD", 10)
 
-        rospy.loginfo("Ready to offboard")
+        rospy.loginfo("Ready to OFFBOARD")
         
 
     def play(self):
@@ -210,18 +240,12 @@ class MavrosOffboardPosctl(MavrosCommon):
         self.wait_for_landed_state(mavutil.mavlink.MAV_LANDED_STATE_ON_GROUND,
                                    10, -1)
 
-        rospy.loginfo("Play: LAND")
         self.set_mode("AUTO.LAND", 5)
-        rospy.loginfo("Play: ARM")
-        #self.set_arm(True, 5)
-        #rospy.sleep(2) # need spin up to stable 
         self.set_arm(True, 5)
-        rospy.loginfo("Play: TAKEOFF")
         self.set_mode("AUTO.TAKEOFF", 5)
         rospy.sleep(1) # wait for AUTO.LOITOR
         
         self.log_topic_vars()
-        rospy.loginfo("Play: OFFBOARD")
         self.set_mode("OFFBOARD", 10)
 
         rospy.loginfo("Start Play Goal")
