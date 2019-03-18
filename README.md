@@ -25,6 +25,7 @@ yarn install
 ## Swam node
 
 ```
+cd ~/src/swam-indoor-flight 
 mkdir -p ~/catkin_ws/src
 cp -Rf swam ~/catkin_ws/src/
 ```
@@ -44,16 +45,23 @@ source devel/setup.bash
 ## Run groundstation and swam node on docker
 
 ```
+mkdir ~/.tmuxinator
+
 tmuxinator new simulator.yaml
-cp ~/src/swam-indoor-flight/simulator.yaml ~/.tmuxinator/
+tmuxinator new server.yaml
+
+cp ~/src/swam-indoor-flight/simulator.yml ~/.tmuxinator/
+cp ~/src/swam-indoor-flight/server.yml ~/.tmuxinator/
 ```
 
 ```
-~/src/swam-indoor-flight/scripts/run-simulator.sh
+cd ~/src/swam-indoor-flight/scripts
+./run-server-with-simulator.sh
 ```
 
 OR
 
 ```
-~/src/swam-indoor-flight/scripts/run-server.sh
+cd ~/src/swam-indoor-flight/scripts
+./run-server.sh
 ```

@@ -8,12 +8,13 @@ windows:
       # 'before' represents legacy functionality and will be deprecated in a future release, in favour of 'after'
       #synchronize: after
       panes:
-        - roscore
-        - sleep 4; roslaunch rosbridge_server rosbridge_websocket.launch
-        - sleep 2; ~/src/swam-indoor-flight/scripts/run-multi-uav-mavros-sitl.sh
+        - 
+        #- roscore
+        #- sleep 4; roslaunch rosbridge_server rosbridge_websocket.launch
+        #- sleep 2; ~/src/swam-indoor-flight/scripts/run-multi-uav-mavros-sitl.sh
   - editor: emacs -Q -nw
   - server:
       layout: even-horizontal
       panes:
-        - cd ~/src/mission; sleep 1; SIMULATOR=true yarn start
-        - sleep 10; ~/src/swam-indoor-flight/scripts/run-multi-uav-mavros-sitl-posctl.sh
+        - cd ~/src/mission; sleep 1; SIMULATOR=false yarn start
+          #- sleep 10; ~/src/swam-indoor-flight/scripts/run-multi-uav-mavros-sitl-posctl.sh
