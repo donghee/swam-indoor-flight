@@ -8,6 +8,7 @@ xhost +local:root
 # apt-get install ros-kinetic-desktop-full
 
 docker run -it \
+    --privileged \
     --publish 14556:14556/udp \
     --publish 8000:8000 \
     --publish 9090:9090 \
@@ -22,4 +23,4 @@ docker run -it \
 export containerId=$(docker ps -l -q)
 
 # access to root
-#docker exec -u 0 -it px4-dev-ros-kinetic-mavros bash
+#docker exec -u 0 -it swam-indoor-flight bash
