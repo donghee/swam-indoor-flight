@@ -79,6 +79,23 @@ catkin build
 source devel/setup.bash
 ```
 
+#### Build rosbridge suite node on docker
+
+Depencent to python tornado 4.5.3 from https://github.com/RobotWebTools/rosbridge_suite/issues/353
+
+```
+sudo pip install tornado==4.5.3
+```
+
+
+```
+cd ~/catkin_ws/src
+git clone https://github.com/RobotWebTools/rosbridge_suite
+catkin build
+source devel/setup.bash
+```
+
+
 #### Build PX4 sitl gazebo on docker
 
 ```
