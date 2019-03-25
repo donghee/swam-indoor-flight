@@ -17,3 +17,4 @@ windows:
       panes:
         - cd ~/src/mission; sleep 1; SIMULATOR=true yarn start
         - sleep 10; ~/src/swam-indoor-flight/scripts/run-multi-uav-mavros-sitl-posctl.sh
+        - sleep 5; cd ~/catkin_ws/src; catkin build mavptp; rosrun mavptp mavptp __ns:=/uav1
