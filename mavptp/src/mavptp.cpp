@@ -52,9 +52,6 @@ private:
   bool currently_armed_ = false;
 
   void mavlinkMessageCallback(const mavros_msgs::Mavlink& msg);
-  void positionCallback(const geometry_msgs::PoseStamped msg);                  // position and orientation from PX4
-
-  void printPose(geometry_msgs::PoseStamped pos);
   void send_message_ptp_timesync(int sysid, int compid, uint8_t seq,
 			       uint8_t msg_type, uint64_t tv_sec, uint64_t tv_nsec);
   void handle_message_ptp_timesync(mavlink_message_t *msg);
@@ -116,19 +113,18 @@ void MavPtpNode::handle_message_ptp_timesync(mavlink_message_t *msg)
 {
 	mavlink_ptp_timesync_t tsync = {};
 	mavlink_msg_ptp_timesync_decode(msg, &tsync);
+	printf("[PTP TIMESYNC] DELAY_REQUEST\n");	
 	printf("[PTP TIMESYNC] R seq: %d, msg_type: %d, tv_sec: %llu, tv_nsec: %llu \n", tsync.seq, tsync.msg_type,
 	        tsync.tv_sec, tsync.tv_nsec);
 
-	// DELAY_REQUEST
 	if (tsync.msg_type == PTP_DELAY_REQUEST) {
 		struct timespec t4 = {};
 		clock_gettime(CLOCK_REALTIME, &t4);
 
-		printf("[PTP TIMESYNC] DELAY_REQUEST\n");
-
 		// DELAY_RESPONSE
+		printf("[PTP TIMESYNC] DELAY_RESPONSE\n");
 		send_message_ptp_timesync(sysid,
-					  compid, 4, PTP_DELAY_RESPONSE,
+					  compid, 3, PTP_DELAY_RESPONSE,
 					  t4.tv_sec, t4.tv_nsec);
 
 		// struct timespec current_time = {};
@@ -139,10 +135,9 @@ void MavPtpNode::handle_message_ptp_timesync(mavlink_message_t *msg)
 		const uint TIME_FMT = strlen("2012-12-31 12:59:59.123456789") + 1;
 		char timestr[TIME_FMT];
 		timespec2str(timestr, sizeof(timestr), &t4);
-		printf("TIME: %s\n", timestr);
+		printf("[PTP TIMESYNC] TIME: %s\n", timestr);
 	}
 }
-
 
 
 void MavPtpNode::mavlinkMessageCallback(const mavros_msgs::Mavlink& msg)
@@ -157,10 +152,9 @@ void MavPtpNode::mavlinkMessageCallback(const mavros_msgs::Mavlink& msg)
 	{
 		sysid = mavMsg.sysid;
 		compid = mavMsg.compid;
-
+/*
 		ROS_INFO("sysid: %d, compid: %d", sysid, compid);
 		ROS_INFO("%s", "Heartbeat");
-/*
 		mavlink_msg_heartbeat_decode(&mavMsg, &hb);
 		ROS_INFO("%d", hb.custom_mode);
 		ROS_INFO("%d", hb.type);
@@ -187,22 +181,7 @@ MavPtpNode::MavPtpNode()
     mavlink_sub_ = n.subscribe(ns + "/mavlink/from", 1000, &MavPtpNode::mavlinkMessageCallback, this);
 }
 
-
 MavPtpNode::~MavPtpNode() {}
-
-void MavPtpNode::printPose(geometry_msgs::PoseStamped pos)
-{
-    printf("Pose\n");
-    printf("Position: x=%.3f y=%.3f z=%.3f\n", pos.pose.position.x, pos.pose.position.y, pos.pose.position.z);
-    printf("Orientation: x=%.3f y=%.3f z=%.3f w=%.3f\n", pos.pose.orientation.x, pos.pose.orientation.y, pos.pose.orientation.z, pos.pose.orientation.w);
-    printf("-------------------------------------\n");
-}
-
-void MavPtpNode::positionCallback(const geometry_msgs::PoseStamped msg) {
-
-   printPose(msg);
-}
-
 
 void MavPtpNode::run() {
 	int rate = 1;
