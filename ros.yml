@@ -1,4 +1,4 @@
-# /home/donghee/.config/tmuxinator/ros.yml
+# /home/odroid/.config/tmuxinator/ros.yml
 
 name: ros
 root: ~/catkin_ws
@@ -60,4 +60,5 @@ windows:
   - shell: 
       layout: even-horizontal
       panes: 
-        - sleep 5; cd ~/catkin_ws/src; catkin build mavptp; rosrun mavptp mavptp __ns:=/uav1
+        - sleep 5; cd ~/catkin_ws/src; catkin build mavptp; rosrun mavptp mavptp
+        - sudo ptpd -i wlan0 -s -E -V
