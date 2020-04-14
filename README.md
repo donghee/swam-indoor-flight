@@ -15,7 +15,7 @@ git clone https://github.com/donghee/swam-indoor-flight
 
 ```
 cd ~/src
-git clone https://github.com/doojinkang/mission 
+git clone https://github.com/donghee/swam-indoor-flight-mission mission  
 ```
 
 ## Swam node
